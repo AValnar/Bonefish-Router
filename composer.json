@@ -1,0 +1,21 @@
+{
+    "name": "av/bonefish-router",
+    "description": "Routing package for Bonefish",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=5.6.0",
+        "av/bonefish": "*",
+        "league/url": "3.1.*",
+        "nikic/fast-route": "0.5.*"
+    },
+    "require-dev": {
+       "phpunit/phpunit": "4.5.*"
+    },
+    "autoload": {
+      "psr-4": {
+        "Bonefish\\Router\\": ["src"],
+        "Bonefish\\Tests\\Router\\": ["tests"]
+      }
+    }
+}
