@@ -31,7 +31,7 @@ final class Route
     protected $httpMethod;
 
     /**
-     * @var RouteDTO
+     * @var RouteCallbackDTO
      */
     protected $dto;
 
@@ -42,10 +42,10 @@ final class Route
 
     /**
      * @param string $httpMethod
-     * @param RouteDTO $dto
+     * @param RouteCallbackDTO $dto
      * @param string $route
      */
-    public function __construct($httpMethod, RouteDTO $dto, $route)
+    public function __construct($httpMethod, RouteCallbackDTO $dto, $route)
     {
         $this->httpMethod = $httpMethod;
         $this->dto = $dto;
@@ -62,7 +62,7 @@ final class Route
     }
 
     /**
-     * @return RouteDTO
+     * @return RouteCallbackDTO
      */
     public function getDto()
     {

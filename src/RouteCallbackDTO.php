@@ -22,7 +22,7 @@
 namespace Bonefish\Router;
 
 
-final class RouteDTO
+final class RouteCallbackDTO
 {
 
     /**
