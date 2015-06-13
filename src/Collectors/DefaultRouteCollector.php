@@ -25,6 +25,8 @@ namespace Bonefish\Router;
 use Bonefish\Injection\Annotations\Inject;
 use Bonefish\Reflection\Meta\MethodMeta;
 use Bonefish\Reflection\ReflectionService;
+use Bonefish\Router\Route\Route;
+use Bonefish\Router\Route\RouteCallbackDTO;
 use Bonefish\Utility\Environment;
 use Nette\Reflection\AnnotationsParser;
 use Symfony\Component\Finder\Finder;

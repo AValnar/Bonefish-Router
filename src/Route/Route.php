@@ -19,63 +19,61 @@
  * @date       12.06.2015
  */
 
-namespace Bonefish\Router;
+namespace Bonefish\Router\Route;
 
 
-final class RouteCallbackDTO
+final class Route
 {
 
     /**
-     * @var string
+     * @var string|array
      */
-    protected $controller;
+    protected $httpMethods;
+
+    /**
+     * @var RouteCallbackDTO
+     */
+    protected $dto;
 
     /**
      * @var string
      */
-    protected $action;
+    protected $route;
 
     /**
-     * @var array
+     * @param string|array $httpMethods
+     * @param RouteCallbackDTO $dto
+     * @param string $route
      */
-    protected $parameters;
-
-    /**
-     * @param $controller
-     * @param $action
-     * @param array $parameters
-     */
-    public function __construct($controller, $action, array $parameters = [])
+    public function __construct($httpMethods, RouteCallbackDTO $dto, $route)
     {
-        $this->controller = $controller;
-        $this->action = $action;
-        $this->parameters = $parameters;
+        $this->httpMethods = $httpMethods;
+        $this->dto = $dto;
+        $this->route = $route;
+    }
+
+
+    /**
+     * @return string|array
+     */
+    public function getHttpMethods()
+    {
+        return $this->httpMethods;
+    }
+
+    /**
+     * @return RouteCallbackDTO
+     */
+    public function getDto()
+    {
+        return $this->dto;
     }
 
     /**
      * @return string
      */
-    public function getController()
+    public function getRoute()
     {
-        return $this->controller;
+        return $this->route;
     }
-
-
-    /**
-     * @return string
-     */
-    public function getAction()
-    {
-        return $this->action;
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
-
 }

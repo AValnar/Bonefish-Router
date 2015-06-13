@@ -16,17 +16,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author     Alexander Schmidt <mail@story75.com>
  * @copyright  Copyright (c) 2015, Alexander Schmidt
- * @date       12.06.2015
+ * @date       13.06.2015
  */
 
 namespace Bonefish\Router;
 
-interface RouteCollector
+
+use Bonefish\Router\Route\RouteCallbackDTO;
+
+final class DispatcherResult
 {
     /**
-     * Aggregate routes and return an array of Route DTOs
-     *
-     * @return Route[]
+     * @var int
      */
-    public function collectRoutes();
+    protected $httpResponseCode;
+
+    /**
+     * @var RouteCallbackDTO
+     */
+    protected $handler;
+
+    public function __construct($httpResponseCode, RouteCallbackDTO $handler)
+    {
+        $this->httpResponseCode = $httpResponseCode;
+        $this->handler = $handler;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHttpResponseCode()
+    {
+        return $this->httpResponseCode;
+    }
+
+    /**
+     * @return RouteCallbackDTO
+     */
+    public function getHandler()
+    {
+        return $this->handler;
+    }
+
+
+
 }

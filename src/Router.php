@@ -18,62 +18,46 @@
  * @copyright  Copyright (c) 2015, Alexander Schmidt
  * @date       12.06.2015
  */
-
 namespace Bonefish\Router;
 
 
-final class Route
+use Bonefish\Router\Route\Route;
+use Bonefish\Router\Route\RouteCallbackDTO;
+
+interface Router
 {
-
     /**
-     * @var string
+     * Add all routes which are available
+     *
+     * @param Route[] $routes
+     * @return void
      */
-    protected $httpMethod;
+    public function addRoutes(array $routes);
 
     /**
-     * @var RouteCallbackDTO
+     * Add error handler for http status code
+     *
+     * @param int $httpStatusCode
+     * @param RouteCallbackDTO $handler
+     * @return void
      */
-    protected $dto;
+    public function addErrorHandler($httpStatusCode, RouteCallbackDTO $handler);
 
     /**
-     * @var string
+     * Add a default handler
+     *
+     * @param RouteCallbackDTO $handler
+     * @return void
      */
-    protected $route;
+    public function addDefaultHandler(RouteCallbackDTO $handler);
 
     /**
+     * Once called the router should examine the current request by request method and url
+     * and find a matching route. If no route was find dispatch a http error instead.
+     *
      * @param string $httpMethod
-     * @param RouteCallbackDTO $dto
-     * @param string $route
+     * @param string $url
+     * @return DispatcherResult
      */
-    public function __construct($httpMethod, RouteCallbackDTO $dto, $route)
-    {
-        $this->httpMethod = $httpMethod;
-        $this->dto = $dto;
-        $this->route = $route;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getHttpMethod()
-    {
-        return $this->httpMethod;
-    }
-
-    /**
-     * @return RouteCallbackDTO
-     */
-    public function getDto()
-    {
-        return $this->dto;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRoute()
-    {
-        return $this->route;
-    }
+    public function dispatch($httpMethod , $url);
 }
