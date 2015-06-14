@@ -19,7 +19,7 @@
  * @date       12.06.2015
  */
 
-namespace Bonefish\Router;
+namespace Bonefish\Router\Collectors;
 
 
 use Bonefish\Injection\Annotations\Inject;
@@ -27,6 +27,8 @@ use Bonefish\Reflection\Meta\MethodMeta;
 use Bonefish\Reflection\ReflectionService;
 use Bonefish\Router\Route\Route;
 use Bonefish\Router\Route\RouteCallbackDTO;
+use Bonefish\Router\Route\RouteCallbackDTOInterface;
+use Bonefish\Router\Route\RouteInterface;
 use Bonefish\Utility\Environment;
 use Nette\Reflection\AnnotationsParser;
 use Symfony\Component\Finder\Finder;
@@ -71,7 +73,7 @@ final class DefaultRouteCollector implements RouteCollector
     }
 
     /**
-     * @return Route[]
+     * @return RouteInterface[]
      */
     public function collectRoutes()
     {
@@ -79,7 +81,7 @@ final class DefaultRouteCollector implements RouteCollector
 
         $dtos = $this->buildDTOs();
 
-        /** @var RouteCallbackDTO $dto */
+        /** @var RouteCallbackDTOInterface $dto */
         foreach($dtos as $dto)
         {
             $routePath = $this->getBaseRouteForDTO($dto);
@@ -195,15 +197,15 @@ final class DefaultRouteCollector implements RouteCollector
     }
 
     /**
-     * @param RouteCallbackDTO $dto
+     * @param RouteCallbackDTOInterface $dto
      * @return string
      */
-    protected function getBaseRouteForDTO(RouteCallbackDTO $dto)
+    protected function getBaseRouteForDTO(RouteCallbackDTOInterface $dto)
     {
         $classMeta = $this->reflectionService->getClassMetaReflection($dto->getController());
         $nameSpaceParts = explode('\\', $classMeta->getNamespace());
         // /vendor/package/controller/action
-        return '/' . $nameSpaceParts[0] . '/'. $nameSpaceParts[1] . '/' . $classMeta->getShortName() . '/' . $dto->getAction();
+        return '/' . $nameSpaceParts[0] . '/'. $nameSpaceParts[1] . '/' . $classMeta->getShortName() . '/' . str_replace('Action', '', $dto->getAction());
     }
 
 }

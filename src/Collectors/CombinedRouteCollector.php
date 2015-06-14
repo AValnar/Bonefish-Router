@@ -19,10 +19,11 @@
  * @date       13.06.2015
  */
 
-namespace Bonefish\Router;
+namespace Bonefish\Router\Collectors;
 
 
 use Bonefish\Router\Route\Route;
+use Bonefish\Router\Route\RouteInterface;
 
 final class CombinedRouteCollector implements RouteCollector
 {
@@ -67,7 +68,7 @@ final class CombinedRouteCollector implements RouteCollector
     /**
      * Aggregate routes and return an array of Route DTOs
      *
-     * @return Route[]
+     * @return RouteInterface[]
      */
     public function collectRoutes()
     {

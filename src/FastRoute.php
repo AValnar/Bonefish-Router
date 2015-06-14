@@ -23,8 +23,9 @@ namespace Bonefish\Router;
 
 
 use Bonefish\Injection\Annotations\Inject;
-use Bonefish\Router\Route\Route;
-use Bonefish\Router\Route\RouteCallbackDTO;
+use Bonefish\Router\Request\RequestInterface;
+use Bonefish\Router\Route\RouteCallbackDTOInterface;
+use Bonefish\Router\Route\RouteInterface;
 use Bonefish\Utility\Environment;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
@@ -33,17 +34,17 @@ final class FastRoute implements Router
 {
 
     /**
-     * @var Route[]
+     * @var RouteInterface
      */
     protected $routes = [];
 
     /**
-     * @var RouteCallbackDTO[]
+     * @var RouteCallbackDTOInterface
      */
     protected $errorHandlers = [];
 
     /**
-     * @var RouteCallbackDTO
+     * @var RouteCallbackDTOInterface
      */
     protected $defaultHandler;
 
@@ -67,14 +68,14 @@ final class FastRoute implements Router
     /**
      * Add all routes which are available
      *
-     * @param Route[] $routes
+     * @param RouteInterface[] $routes
      * @return void
      */
     public function addRoutes(array $routes = [])
     {
         foreach($routes as $route)
         {
-            if ($route instanceof Route) $routes[] = $route;
+            if ($route instanceof RouteInterface) $this->routes[] = $route;
         }
     }
 
@@ -82,10 +83,10 @@ final class FastRoute implements Router
      * Add error handler for http status code
      *
      * @param int $httpStatusCode
-     * @param RouteCallbackDTO $handler
+     * @param RouteCallbackDTOInterface $handler
      * @return void
      */
-    public function addErrorHandler($httpStatusCode, RouteCallbackDTO $handler)
+    public function addErrorHandler($httpStatusCode, RouteCallbackDTOInterface $handler)
     {
         $this->errorHandlers[$httpStatusCode] = $handler;
     }
@@ -93,10 +94,10 @@ final class FastRoute implements Router
     /**
      * Add a default handler
      *
-     * @param RouteCallbackDTO $handler
+     * @param RouteCallbackDTOInterface $handler
      * @return void
      */
-    public function addDefaultHandler(RouteCallbackDTO $handler)
+    public function addDefaultHandler(RouteCallbackDTOInterface $handler)
     {
         $this->defaultHandler = $handler;
     }
@@ -108,15 +109,18 @@ final class FastRoute implements Router
      * Dispatch means in this context that the router will use the RouteCallbackDTO in the Route
      * and call the controller with the correct action and pass the parameters.
      *
-     * @param string $httpMethod
-     * @param string $url
-     * @return DispatcherResult
+     * @param RequestInterface $request
+     * @return DispatcherResultInterface
      */
-    public function dispatch($httpMethod , $url)
+    public function dispatch(RequestInterface $request)
     {
+        if ($request->getUri() === '' || $request->getUri() === '/') {
+            return new DispatcherResult(200, $this->defaultHandler);
+        }
+
         $dispatcher = $this->getDispatcher();
 
-        $match = $dispatcher->dispatch($httpMethod, $url);
+        $match = $dispatcher->dispatch($request->getMethod(), $request->getUri());
 
         $code = null;
         $handler = null;
@@ -133,7 +137,7 @@ final class FastRoute implements Router
                 break;
             case Dispatcher::FOUND:
                 $code = 200;
-                /** @var RouteCallbackDTO $handler */
+                /** @var RouteCallbackDTOInterface $handler */
                 $handler = $match[1];
                 $handler->setSuppliedParameters($match[2]);
                 break;
@@ -148,7 +152,7 @@ final class FastRoute implements Router
 
     protected function getDispatcher()
     {
-        $cachePath = $this->environment->getFullCachePath() . self::CACHE_FILE;
+        $cachePath = $this->getCacheFilePath();
 
         $routes = $this->routes;
 
@@ -161,6 +165,11 @@ final class FastRoute implements Router
         ]);
 
         return $dispatcher;
+    }
+
+    public function getCacheFilePath()
+    {
+        return $this->environment->getFullCachePath() . self::CACHE_FILE;
     }
 
 

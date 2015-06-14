@@ -21,15 +21,19 @@
 namespace Bonefish\Router;
 
 
+use Bonefish\Router\Request\Request;
+use Bonefish\Router\Request\RequestInterface;
 use Bonefish\Router\Route\Route;
 use Bonefish\Router\Route\RouteCallbackDTO;
+use Bonefish\Router\Route\RouteCallbackDTOInterface;
+use Bonefish\Router\Route\RouteInterface;
 
 interface Router
 {
     /**
      * Add all routes which are available
      *
-     * @param Route[] $routes
+     * @param RouteInterface[] $routes
      * @return void
      */
     public function addRoutes(array $routes);
@@ -38,26 +42,25 @@ interface Router
      * Add error handler for http status code
      *
      * @param int $httpStatusCode
-     * @param RouteCallbackDTO $handler
+     * @param RouteCallbackDTOInterface $handler
      * @return void
      */
-    public function addErrorHandler($httpStatusCode, RouteCallbackDTO $handler);
+    public function addErrorHandler($httpStatusCode, RouteCallbackDTOInterface $handler);
 
     /**
      * Add a default handler
      *
-     * @param RouteCallbackDTO $handler
+     * @param RouteCallbackDTOInterface $handler
      * @return void
      */
-    public function addDefaultHandler(RouteCallbackDTO $handler);
+    public function addDefaultHandler(RouteCallbackDTOInterface $handler);
 
     /**
      * Once called the router should examine the current request by request method and url
      * and find a matching route. If no route was find dispatch a http error instead.
      *
-     * @param string $httpMethod
-     * @param string $url
-     * @return DispatcherResult
+     * @param RequestInterface $request
+     * @return DispatcherResultInterface
      */
-    public function dispatch($httpMethod , $url);
+    public function dispatch(RequestInterface $request);
 }

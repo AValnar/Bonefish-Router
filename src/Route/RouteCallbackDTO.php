@@ -22,7 +22,7 @@
 namespace Bonefish\Router\Route;
 
 
-final class RouteCallbackDTO
+final class RouteCallbackDTO implements RouteCallbackDTOInterface
 {
 
     /**
@@ -97,6 +97,15 @@ final class RouteCallbackDTO
     public function setSuppliedParameters($suppliedParameters)
     {
         $this->suppliedParameters = $suppliedParameters;
+    }
+
+    /**
+     * @param array $parameters
+     * @return RouteCallbackDTOInterface
+     */
+    public static function __set_state(array $parameters)
+    {
+        return new self($parameters['controller'], $parameters['action'], $parameters['parameters']);
     }
 
 

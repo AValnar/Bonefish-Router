@@ -16,20 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author     Alexander Schmidt <mail@story75.com>
  * @copyright  Copyright (c) 2015, Alexander Schmidt
- * @date       12.06.2015
+ * @date       14.06.2015
  */
+namespace Bonefish\Router\Request;
 
-namespace Bonefish\Router\Collectors;
-
-use Bonefish\Router\Route\Route;
-use Bonefish\Router\Route\RouteInterface;
-
-interface RouteCollector
+interface RequestHandlerInterface
 {
-    /**
-     * Aggregate routes and return an array of Route DTOs
-     *
-     * @return RouteInterface[]
-     */
-    public function collectRoutes();
+    public function handleRequest(RequestInterface $request);
 }

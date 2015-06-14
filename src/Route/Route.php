@@ -22,7 +22,7 @@
 namespace Bonefish\Router\Route;
 
 
-final class Route
+final class Route implements RouteInterface
 {
 
     /**
@@ -31,7 +31,7 @@ final class Route
     protected $httpMethods;
 
     /**
-     * @var RouteCallbackDTO
+     * @var RouteCallbackDTOInterface
      */
     protected $dto;
 
@@ -42,14 +42,14 @@ final class Route
 
     /**
      * @param string|array $httpMethods
-     * @param RouteCallbackDTO $dto
+     * @param RouteCallbackDTOInterface $dto
      * @param string $route
      */
-    public function __construct($httpMethods, RouteCallbackDTO $dto, $route)
+    public function __construct($httpMethods, RouteCallbackDTOInterface $dto, $route)
     {
         $this->httpMethods = $httpMethods;
         $this->dto = $dto;
-        $this->route = $route;
+        $this->route = strtolower($route);
     }
 
 
@@ -62,7 +62,7 @@ final class Route
     }
 
     /**
-     * @return RouteCallbackDTO
+     * @return RouteCallbackDTOInterface
      */
     public function getDto()
     {

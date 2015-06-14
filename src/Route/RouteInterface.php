@@ -16,49 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author     Alexander Schmidt <mail@story75.com>
  * @copyright  Copyright (c) 2015, Alexander Schmidt
- * @date       13.06.2015
+ * @date       14.06.2015
  */
+namespace Bonefish\Router\Route;
 
-namespace Bonefish\Router;
-
-
-use Bonefish\Router\Route\RouteCallbackDTO;
-use Bonefish\Router\Route\RouteCallbackDTOInterface;
-
-final class DispatcherResult implements DispatcherResultInterface
+interface RouteInterface
 {
     /**
-     * @var int
+     * @return string|array
      */
-    protected $httpResponseCode;
-
-    /**
-     * @var RouteCallbackDTOInterface
-     */
-    protected $handler;
-
-    public function __construct($httpResponseCode, RouteCallbackDTOInterface $handler)
-    {
-        $this->httpResponseCode = $httpResponseCode;
-        $this->handler = $handler;
-    }
-
-    /**
-     * @return int
-     */
-    public function getHttpResponseCode()
-    {
-        return $this->httpResponseCode;
-    }
+    public function getHttpMethods();
 
     /**
      * @return RouteCallbackDTOInterface
      */
-    public function getHandler()
-    {
-        return $this->handler;
-    }
+    public function getDto();
 
-
-
+    /**
+     * Return uri in lower case
+     *
+     * @return string
+     */
+    public function getRoute();
 }
