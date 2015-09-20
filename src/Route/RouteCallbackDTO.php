@@ -26,14 +26,9 @@ final class RouteCallbackDTO implements RouteCallbackDTOInterface
 {
 
     /**
-     * @var string
+     * @var callable
      */
-    protected $controller;
-
-    /**
-     * @var string
-     */
-    protected $action;
+    protected $callback;
 
     /**
      * @var array
@@ -46,32 +41,21 @@ final class RouteCallbackDTO implements RouteCallbackDTOInterface
     protected $suppliedParameters;
 
     /**
-     * @param $controller
-     * @param $action
+     * @param callable $callback
      * @param array $parameters
      */
-    public function __construct($controller, $action, array $parameters = [])
+    public function __construct(callable $callback, array $parameters = [])
     {
-        $this->controller = $controller;
-        $this->action = $action;
+        $this->callback = $callback;
         $this->parameters = $parameters;
     }
 
     /**
-     * @return string
+     * @return callable
      */
-    public function getController()
+    public function getCallback()
     {
-        return $this->controller;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getAction()
-    {
-        return $this->action;
+        return $this->callback;
     }
 
 
@@ -105,7 +89,7 @@ final class RouteCallbackDTO implements RouteCallbackDTOInterface
      */
     public static function __set_state(array $parameters)
     {
-        return new self($parameters['controller'], $parameters['action'], $parameters['parameters']);
+        return new self($parameters['callback'], $parameters['parameters']);
     }
 
 

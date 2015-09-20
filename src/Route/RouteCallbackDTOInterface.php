@@ -23,14 +23,9 @@ namespace Bonefish\Router\Route;
 interface RouteCallbackDTOInterface
 {
     /**
-     * @return string
+     * @return callable
      */
-    public function getController();
-
-    /**
-     * @return string
-     */
-    public function getAction();
+    public function getCallback();
 
     /**
      * @return array

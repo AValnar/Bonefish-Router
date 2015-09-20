@@ -21,10 +21,7 @@
 namespace Bonefish\Router;
 
 
-use Bonefish\Router\Request\Request;
 use Bonefish\Router\Request\RequestInterface;
-use Bonefish\Router\Route\Route;
-use Bonefish\Router\Route\RouteCallbackDTO;
 use Bonefish\Router\Route\RouteCallbackDTOInterface;
 use Bonefish\Router\Route\RouteInterface;
 

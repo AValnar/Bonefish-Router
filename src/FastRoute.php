@@ -22,11 +22,9 @@
 namespace Bonefish\Router;
 
 
-use Bonefish\Injection\Annotations\Inject;
 use Bonefish\Router\Request\RequestInterface;
 use Bonefish\Router\Route\RouteCallbackDTOInterface;
 use Bonefish\Router\Route\RouteInterface;
-use Bonefish\Utility\Environment;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 
@@ -39,7 +37,7 @@ final class FastRoute implements Router
     protected $routes = [];
 
     /**
-     * @var RouteCallbackDTOInterface
+     * @var RouteCallbackDTOInterface[]
      */
     protected $errorHandlers = [];
 
@@ -49,19 +47,16 @@ final class FastRoute implements Router
     protected $defaultHandler;
 
     /**
-     * @var Environment
+     * @var string
      */
-    protected $environment;
-
-    const CACHE_FILE = '/fastroute.routes.cache';
+    protected $cacheFile;
 
     /**
-     * @param Environment $environment
-     * @Inject
+     * @param string $cacheFile
      */
-    public function __construct(Environment $environment)
+    public function __construct($cacheFile = '/var/tmp/fastroute.routes.cache')
     {
-        $this->environment = $environment;
+        $this->cacheFile = $cacheFile;
     }
 
 
@@ -154,6 +149,7 @@ final class FastRoute implements Router
     {
         $cachePath = $this->getCacheFilePath();
 
+        /** @var RouteInterface[] $routes */
         $routes = $this->routes;
 
         $dispatcher = \FastRoute\cachedDispatcher(function(RouteCollector $r) use ($routes) {
@@ -169,7 +165,7 @@ final class FastRoute implements Router
 
     public function getCacheFilePath()
     {
-        return $this->environment->getFullCachePath() . self::CACHE_FILE;
+        return $this->cacheFile;
     }
 
 

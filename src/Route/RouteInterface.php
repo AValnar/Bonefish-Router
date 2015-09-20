@@ -23,7 +23,7 @@ namespace Bonefish\Router\Route;
 interface RouteInterface
 {
     /**
-     * @return string|array
+     * @return array
      */
     public function getHttpMethods();
 

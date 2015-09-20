@@ -26,7 +26,7 @@ final class Route implements RouteInterface
 {
 
     /**
-     * @var string|array
+     * @var array
      */
     protected $httpMethods;
 
@@ -54,7 +54,7 @@ final class Route implements RouteInterface
 
 
     /**
-     * @return string|array
+     * @return array
      */
     public function getHttpMethods()
     {

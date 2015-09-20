@@ -21,9 +21,8 @@
 
 namespace Bonefish\Router\Request;
 
-use Bonefish\HelloWorld\Controller\Controller;
 use Bonefish\Injection\Annotations\Inject;
-use Bonefish\Injection\ContainerInterface;
+use Bonefish\Injection\Container\ContainerInterface;
 use Bonefish\Router\Collectors\RouteCollector;
 use Bonefish\Router\FastRoute;
 use Bonefish\Router\Route\RouteCallbackDTO;
@@ -61,7 +60,7 @@ final class FastRouteRequestHandler implements RequestHandlerInterface
 
     public function handleRequest(RequestInterface $request)
     {
-        $defaultHandler = new RouteCallbackDTO(Controller::class, 'indexAction');
+        $defaultHandler = new RouteCallbackDTO(function(){echo 'HelloWorld';});
 
         $this->router->addDefaultHandler($defaultHandler);
         $this->router->addErrorHandler(404, $defaultHandler);
@@ -71,24 +70,18 @@ final class FastRouteRequestHandler implements RequestHandlerInterface
             $this->router->addRoutes($this->routeCollector->collectRoutes());
         }
 
-        $dispatcherResult = $this->router->dispatch($request);
+        $dispatcherResultHandler = $this->router->dispatch($request)->getHandler();
 
-        $controllerClass = $dispatcherResult->getHandler()->getController();
-        $controllerObject = $this->container->get($controllerClass);
-
-        $action = $dispatcherResult->getHandler()->getAction();
-
-        $suppliedParameters = $dispatcherResult->getHandler()->getSuppliedParameters();
+        $suppliedParameters = $dispatcherResultHandler->getSuppliedParameters();
         $sortedParameters = [];
 
-        foreach($dispatcherResult->getHandler()->getParameters() as $parameter => $optional) {
+        foreach($dispatcherResultHandler->getParameters() as $parameter => $optional) {
             if (isset($suppliedParameters[$parameter])) {
                 $sortedParameters[] = $suppliedParameters[$parameter];
             }
         }
 
-        echo $dispatcherResult->getHttpResponseCode();
+        call_user_func($dispatcherResultHandler->getCallback(), ...$sortedParameters);
 
-        $controllerObject->{$action}(...$sortedParameters);
     }
 }

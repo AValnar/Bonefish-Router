@@ -23,18 +23,19 @@ namespace Bonefish\Router\Collectors;
 
 
 use Bonefish\Injection\Annotations\Inject;
+use Bonefish\Injection\Container\ContainerInterface;
+use Bonefish\Injection\LazyObject;
 use Bonefish\Reflection\Meta\MethodMeta;
 use Bonefish\Reflection\ReflectionService;
 use Bonefish\Router\Route\Route;
 use Bonefish\Router\Route\RouteCallbackDTO;
 use Bonefish\Router\Route\RouteCallbackDTOInterface;
 use Bonefish\Router\Route\RouteInterface;
-use Bonefish\Utility\Environment;
 use Nette\Reflection\AnnotationsParser;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-final class DefaultRouteCollector implements RouteCollector
+final class ControllerRouteCollector implements RouteCollector
 {
 
     /**
@@ -43,33 +44,49 @@ final class DefaultRouteCollector implements RouteCollector
     protected $finder;
 
     /**
-     * @var Environment
+     * @var string
      */
-    protected $environment;
+    protected $packagesPath;
+
+    /**
+     * @var string
+     */
+    protected $vendorPath;
 
     /**
      * @var ReflectionService
      */
     protected $reflectionService;
 
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
     const ACTION_SUFFIX = 'Action';
     const DEFAULT_HTTP_METHOD = 'GET';
 
     /**
      * @param Finder $finder
-     * @param Environment $environment
+     * @param string $packagesPath
+     * @param string $vendorPath
      * @param ReflectionService $reflectionService
+     * @param ContainerInterface $container
      * @Inject
      */
     public function __construct(
         Finder $finder,
-        Environment $environment,
-        ReflectionService $reflectionService
+        $packagesPath,
+        $vendorPath,
+        ReflectionService $reflectionService,
+        ContainerInterface $container
     )
     {
         $this->finder = $finder;
-        $this->environment = $environment;
+        $this->packagesPath = $packagesPath;
+        $this->vendorPath = $vendorPath;
         $this->reflectionService = $reflectionService;
+        $this->container = $container;
     }
 
     /**
@@ -81,15 +98,17 @@ final class DefaultRouteCollector implements RouteCollector
 
         $dtos = $this->buildDTOs();
 
-        /** @var RouteCallbackDTOInterface $dto */
-        foreach($dtos as $dto)
+        /** @var array $dtoArray */
+        foreach($dtos as $dtoArray)
         {
-            $routePath = $this->getBaseRouteForDTO($dto);
+            /** @var RouteCallbackDTOInterface $dto */
+            $dto = $dtoArray['dto'];
+            $routePath = $this->getBaseRouteForDTO($dtoArray['controller'], $dtoArray['action']);
             $parameters = $dto->getParameters();
 
             // No parameters so just generate default route and continue
             if (count($parameters) == 0) {
-                $routes[] = new Route(self::DEFAULT_HTTP_METHOD, $dto, $routePath);
+                $routes[] = new Route([self::DEFAULT_HTTP_METHOD], $dto, $routePath);
                 continue;
             }
 
@@ -97,14 +116,14 @@ final class DefaultRouteCollector implements RouteCollector
             foreach($dto->getParameters() as $parameterName => $isParameterOptional)
             {
                 if ($isParameterOptional) {
-                    $routes[] = new Route(self::DEFAULT_HTTP_METHOD, $dto, $routePath);
+                    $routes[] = new Route([self::DEFAULT_HTTP_METHOD], $dto, $routePath);
                 }
 
                 $routePath .= '/{' . $parameterName . '}';
             }
 
             // Add possible last route ( all required parameters or last optional one )
-            $routes[] = new Route(self::DEFAULT_HTTP_METHOD, $dto, $routePath);
+            $routes[] = new Route([self::DEFAULT_HTTP_METHOD], $dto, $routePath);
         }
 
         return $routes;
@@ -114,8 +133,8 @@ final class DefaultRouteCollector implements RouteCollector
     {
         $controllers = [];
 
-        $packagesPath = $this->environment->getFullPackagePath();
-        $vendorPath = $this->environment->getBasePath() . '/vendor';
+        $packagesPath = $this->packagesPath;
+        $vendorPath = $this->vendorPath;
 
         $this->finder->files()
             ->ignoreUnreadableDirs()
@@ -159,6 +178,9 @@ final class DefaultRouteCollector implements RouteCollector
         return $actions;
     }
 
+    /**
+     * @return array
+     */
     protected function buildDTOs()
     {
         $dtos = [];
@@ -173,7 +195,16 @@ final class DefaultRouteCollector implements RouteCollector
             foreach($actions as $action)
             {
                 $parameters = $this->getParametersFromAction($action);
-                $dtos[] = new RouteCallbackDTO($controller, $action->getName(), $parameters);
+                $dtos[] = [
+                    'controller' => $controller,
+                    'action' => $action->getName(),
+                    'dto' => new RouteCallbackDTO(
+                            [new LazyObject($controller, $this->container),
+                            $action->getName()],
+                            $parameters
+                    )
+                ];
+
             }
         }
 
@@ -197,15 +228,16 @@ final class DefaultRouteCollector implements RouteCollector
     }
 
     /**
-     * @param RouteCallbackDTOInterface $dto
+     * @param string $controller
+     * @param string $action
      * @return string
      */
-    protected function getBaseRouteForDTO(RouteCallbackDTOInterface $dto)
+    protected function getBaseRouteForDTO($controller, $action)
     {
-        $classMeta = $this->reflectionService->getClassMetaReflection($dto->getController());
+        $classMeta = $this->reflectionService->getClassMetaReflection($controller);
         $nameSpaceParts = explode('\\', $classMeta->getNamespace());
         // /vendor/package/controller/action
-        return '/' . $nameSpaceParts[0] . '/'. $nameSpaceParts[1] . '/' . $classMeta->getShortName() . '/' . str_replace('Action', '', $dto->getAction());
+        return '/' . $nameSpaceParts[0] . '/'. $nameSpaceParts[1] . '/' . $classMeta->getShortName() . '/' . str_replace('Action', '', $action);
     }
 
 }
