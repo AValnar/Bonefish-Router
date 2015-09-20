@@ -21,8 +21,6 @@
 
 namespace Bonefish\Router\Request;
 
-use Bonefish\Injection\Annotations\Inject;
-use Bonefish\Injection\Container\ContainerInterface;
 use Bonefish\Router\Collectors\RouteCollector;
 use Bonefish\Router\FastRoute;
 use Bonefish\Router\Route\RouteCallbackDTO;
@@ -40,21 +38,13 @@ final class FastRouteRequestHandler implements RequestHandlerInterface
     protected $routeCollector;
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @param FastRoute $router
      * @param RouteCollector $routeCollector
-     * @param ContainerInterface $container
-     * @Inject
      */
-    public function __construct(FastRoute $router, RouteCollector $routeCollector, ContainerInterface $container)
+    public function __construct(FastRoute $router, RouteCollector $routeCollector)
     {
         $this->router = $router;
         $this->routeCollector = $routeCollector;
-        $this->container = $container;
     }
 
 

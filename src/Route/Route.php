@@ -41,7 +41,7 @@ final class Route implements RouteInterface
     protected $route;
 
     /**
-     * @param string|array $httpMethods
+     * @param array $httpMethods
      * @param RouteCallbackDTOInterface $dto
      * @param string $route
      */
