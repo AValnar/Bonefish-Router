@@ -60,11 +60,23 @@ final class FastRouteRequestHandler implements RequestHandlerInterface
 
     public function handleRequest(RequestInterface $request)
     {
-        $defaultHandler = new RouteCallbackDTO(function(){echo 'HelloWorld';});
-
-        $this->router->addDefaultHandler($defaultHandler);
-        $this->router->addErrorHandler(404, $defaultHandler);
-        $this->router->addErrorHandler(405, $defaultHandler);
+        $this->router->addDefaultHandler(
+            new RouteCallbackDTO(function(){
+                echo 'Hello World!';
+            })
+        );
+        $this->router->addErrorHandler(
+            404,
+            new RouteCallbackDTO(function(){
+                echo '404!';
+            })
+        );
+        $this->router->addErrorHandler(
+            405,
+            new RouteCallbackDTO(function(){
+                echo '405';
+            })
+        );
 
         if (!file_exists($this->router->getCacheFilePath())) {
             $this->router->addRoutes($this->routeCollector->collectRoutes());

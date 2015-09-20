@@ -22,7 +22,6 @@
 namespace Bonefish\Router\Collectors;
 
 
-use Bonefish\Injection\Annotations\Inject;
 use Bonefish\Injection\Container\ContainerInterface;
 use Bonefish\Injection\LazyObject;
 use Bonefish\Reflection\Meta\MethodMeta;
@@ -68,18 +67,17 @@ final class ControllerRouteCollector implements RouteCollector
 
     /**
      * @param Finder $finder
-     * @param string $packagesPath
-     * @param string $vendorPath
      * @param ReflectionService $reflectionService
      * @param ContainerInterface $container
-     * @Inject
+     * @param string $packagesPath
+     * @param string $vendorPath
      */
     public function __construct(
         Finder $finder,
-        $packagesPath,
-        $vendorPath,
         ReflectionService $reflectionService,
-        ContainerInterface $container
+        ContainerInterface $container,
+        $packagesPath,
+        $vendorPath
     )
     {
         $this->finder = $finder;
