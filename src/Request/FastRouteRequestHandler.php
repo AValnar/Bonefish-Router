@@ -21,8 +21,10 @@
 
 namespace Bonefish\Router\Request;
 
+use Bonefish\Injection\Container\ContainerInterface;
 use Bonefish\Router\Collectors\RouteCollector;
 use Bonefish\Router\FastRoute;
+use Bonefish\Router\LazyDTOCallback;
 use Bonefish\Router\Route\RouteCallbackDTO;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,34 +42,44 @@ final class FastRouteRequestHandler implements RequestHandlerInterface
     protected $routeCollector;
 
     /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * @param FastRoute $router
      * @param RouteCollector $routeCollector
+     * @param ContainerInterface $container
      */
-    public function __construct(FastRoute $router, RouteCollector $routeCollector)
+    public function __construct(FastRoute $router, RouteCollector $routeCollector, ContainerInterface $container)
     {
         $this->router = $router;
         $this->routeCollector = $routeCollector;
+        $this->container = $container;
     }
 
 
     public function handleRequest(Request $request)
     {
         $this->router->addDefaultHandler(
-            new RouteCallbackDTO(function(){
+            new RouteCallbackDTO(function () {
                 return new Response("Hello World");
             })
         );
         $this->router->addErrorHandler(
             404,
-            new RouteCallbackDTO(function(){
+            new RouteCallbackDTO(function () {
                 return new Response("Not found!", 404);
             })
         );
         $this->router->addErrorHandler(
             405,
-            new RouteCallbackDTO(function($allowedMethods){
-                return new Response("Method ".$allowedMethods[0]." is not allowed! Use " . $allowedMethods[1], 405);
-            })
+            new RouteCallbackDTO(
+                function ($allowedMethods) use ($request) {
+                    return new Response("Method " . $request->getMethod() . " is not allowed! Use one of these: " . implode(',', $allowedMethods), 405);
+                },
+                ['allowedMethods' => false]
+            )
         );
 
         if (!file_exists($this->router->getCacheFilePath())) {
@@ -79,7 +91,7 @@ final class FastRouteRequestHandler implements RequestHandlerInterface
         $suppliedParameters = $dispatcherResultHandler->getSuppliedParameters();
         $sortedParameters = [];
 
-        foreach($dispatcherResultHandler->getParameters() as $parameter => $optional) {
+        foreach ($dispatcherResultHandler->getParameters() as $parameter => $optional) {
             if (isset($suppliedParameters[$parameter])) {
                 $sortedParameters[] = $suppliedParameters[$parameter];
             } elseif (!$optional) {
@@ -87,6 +99,13 @@ final class FastRouteRequestHandler implements RequestHandlerInterface
             }
         }
 
-        return call_user_func($dispatcherResultHandler->getCallback(), ...$sortedParameters);
+        $callback = $dispatcherResultHandler->getCallback();
+
+        if ($callback instanceof LazyDTOCallback)
+        {
+            $callback = [$this->container->get($callback->getClassName()), $callback->getAction()];
+        }
+
+        return call_user_func($callback, ...$sortedParameters);
     }
 }

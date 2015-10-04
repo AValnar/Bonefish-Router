@@ -22,6 +22,8 @@
 namespace Bonefish\Router\Route;
 
 
+use Bonefish\Router\LazyDTOCallback;
+
 final class RouteCallbackDTO implements RouteCallbackDTOInterface
 {
 
@@ -41,10 +43,10 @@ final class RouteCallbackDTO implements RouteCallbackDTOInterface
     protected $suppliedParameters;
 
     /**
-     * @param callable $callback
+     * @param callable|LazyDTOCallback $callback
      * @param array $parameters
      */
-    public function __construct(callable $callback, array $parameters = [])
+    public function __construct($callback, array $parameters = [])
     {
         $this->callback = $callback;
         $this->parameters = $parameters;
