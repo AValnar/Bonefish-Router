@@ -82,6 +82,8 @@ final class FastRouteRequestHandler implements RequestHandlerInterface
         foreach($dispatcherResultHandler->getParameters() as $parameter => $optional) {
             if (isset($suppliedParameters[$parameter])) {
                 $sortedParameters[] = $suppliedParameters[$parameter];
+            } elseif (!$optional) {
+                $sortedParameters[] = $request->request->get($parameter);
             }
         }
 
