@@ -22,11 +22,11 @@
 namespace Bonefish\Router;
 
 
-use Bonefish\Router\Request\RequestInterface;
 use Bonefish\Router\Route\RouteCallbackDTOInterface;
 use Bonefish\Router\Route\RouteInterface;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
+use Symfony\Component\HttpFoundation\Request;
 
 final class FastRoute implements Router
 {
@@ -104,18 +104,18 @@ final class FastRoute implements Router
      * Dispatch means in this context that the router will use the RouteCallbackDTO in the Route
      * and call the controller with the correct action and pass the parameters.
      *
-     * @param RequestInterface $request
+     * @param Request $request
      * @return DispatcherResultInterface
      */
-    public function dispatch(RequestInterface $request)
+    public function dispatch(Request $request)
     {
-        if ($request->getUri() === '' || $request->getUri() === '/') {
+        if (ltrim($_SERVER['REQUEST_URI'], '/') === '') {
             return new DispatcherResult(200, $this->defaultHandler);
         }
 
         $dispatcher = $this->getDispatcher();
 
-        $match = $dispatcher->dispatch($request->getMethod(), $request->getUri());
+        $match = $dispatcher->dispatch($request->getMethod(), $_SERVER['REQUEST_URI']);
 
         $code = null;
         $handler = null;

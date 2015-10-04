@@ -20,7 +20,9 @@
  */
 namespace Bonefish\Router\Request;
 
+use Symfony\Component\HttpFoundation\Request;
+
 interface RequestHandlerInterface
 {
-    public function handleRequest(RequestInterface $request);
+    public function handleRequest(Request $request);
 }

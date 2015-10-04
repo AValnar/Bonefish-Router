@@ -24,6 +24,8 @@ namespace Bonefish\Router\Request;
 use Bonefish\Router\Collectors\RouteCollector;
 use Bonefish\Router\FastRoute;
 use Bonefish\Router\Route\RouteCallbackDTO;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class FastRouteRequestHandler implements RequestHandlerInterface
 {
@@ -48,23 +50,23 @@ final class FastRouteRequestHandler implements RequestHandlerInterface
     }
 
 
-    public function handleRequest(RequestInterface $request)
+    public function handleRequest(Request $request)
     {
         $this->router->addDefaultHandler(
             new RouteCallbackDTO(function(){
-                echo 'Hello World!';
+                return new Response("Hello World");
             })
         );
         $this->router->addErrorHandler(
             404,
             new RouteCallbackDTO(function(){
-                echo '404!';
+                return new Response("Not found!", 404);
             })
         );
         $this->router->addErrorHandler(
             405,
-            new RouteCallbackDTO(function(){
-                echo '405';
+            new RouteCallbackDTO(function($allowedMethods){
+                return new Response("Method ".$allowedMethods[0]." is not allowed! Use " . $allowedMethods[1], 405);
             })
         );
 
@@ -83,7 +85,6 @@ final class FastRouteRequestHandler implements RequestHandlerInterface
             }
         }
 
-        call_user_func($dispatcherResultHandler->getCallback(), ...$sortedParameters);
-
+        return call_user_func($dispatcherResultHandler->getCallback(), ...$sortedParameters);
     }
 }

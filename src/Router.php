@@ -21,9 +21,9 @@
 namespace Bonefish\Router;
 
 
-use Bonefish\Router\Request\RequestInterface;
 use Bonefish\Router\Route\RouteCallbackDTOInterface;
 use Bonefish\Router\Route\RouteInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 interface Router
 {
@@ -56,8 +56,8 @@ interface Router
      * Once called the router should examine the current request by request method and url
      * and find a matching route. If no route was find dispatch a http error instead.
      *
-     * @param RequestInterface $request
+     * @param Request $request
      * @return DispatcherResultInterface
      */
-    public function dispatch(RequestInterface $request);
+    public function dispatch(Request $request);
 }
